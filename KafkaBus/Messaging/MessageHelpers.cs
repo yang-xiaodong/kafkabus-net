@@ -78,14 +78,7 @@ namespace KafkaBus.Messaging
 
             var response = new KafkaMessagePacket();
 
-            //var respFeature = message as IHttpResponseFeature;
-            //if (respFeature.Headers != null)
-            //{
-            //    foreach (var hdr in respFeature.Headers)
-            //    {
-            //        response.Headers.Add(hdr.Key, hdr.Value);
-            //    }
-            //}
+    
 
             //response.Version = HTTP_RESPONSE_VERSION;
             //response.StatusCode = respFeature.StatusCode;
