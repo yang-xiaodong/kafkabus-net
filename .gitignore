@@ -3,3 +3,6 @@
 ################################################################################
 
 /KafkaBus/bin/Debug
+/.vs
+/KafkaBus/obj/Debug
+/KafkaBus/project.lock.json
