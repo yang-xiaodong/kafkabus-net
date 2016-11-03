@@ -6,3 +6,8 @@
 /.vs
 /KafkaBus/obj/Debug
 /KafkaBus/project.lock.json
+bin
+obj
+.pdb
+.user
+*.user
