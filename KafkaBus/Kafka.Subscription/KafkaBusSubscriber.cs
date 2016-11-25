@@ -1,21 +1,15 @@
 ﻿using KafkaBus.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace KafkaBus.Kafka.Subscription
 {
     public class KafkaBusSubscriber : IKafkaBusSubscriber
     {
-
-        readonly InterlockedBoolean hasStarted;
+        private readonly InterlockedBoolean hasStarted;
 
         public KafkaBusSubscriber() {
-
         }
-
-     
 
         public IList<string> ConnectionNames {
             get {
@@ -34,6 +28,7 @@ namespace KafkaBus.Kafka.Subscription
                 return hasStarted;
             }
         }
+
         //public void Restart() {
         //    hasStarted.Set(true);
 
@@ -108,7 +103,7 @@ namespace KafkaBus.Kafka.Subscription
         //    subscriberChannel.Channel.BasicQos(0, (ushort)Settings.PrefetchCount, false);
         //    subscriberChannel.Channel.BasicConsume(subscriberWorkQueueName, Settings.AckBehavior == SubscriberAckBehavior.Automatic, subscriberConsumer);
 
-        //    //Cancel connectionBroken on connection/consumer problems 
+        //    //Cancel connectionBroken on connection/consumer problems
         //    pool.Connection.ConnectionShutdown += (s, e) => { connectionBroken.Cancel(); };
         //    workConsumer.ConsumerCancelled += (s, e) => { connectionBroken.Cancel(); };
         //    subscriberConsumer.ConsumerCancelled += (s, e) => { connectionBroken.Cancel(); };

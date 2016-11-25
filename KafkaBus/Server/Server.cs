@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using KafkaBus.Common;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
+using System;
+using System.Collections.Generic;
 using System.Threading;
-using KafkaBus.Common;
-using KafkaBus.Server;
 
 namespace KafkaBus.Server
 {
-
     public class Server : IServer
     {
-
         internal const string ConfigServerArgumentName = "server"; // The argument passed to Microsoft.AspNetCore..Hosting.Program.Main()
         internal const string ConfigServerAssembly = "KafkaBus"; // The server assembly name passed to Microsoft.AspNetCore..Hosting.Program.Main()
 
@@ -117,7 +113,5 @@ namespace KafkaBus.Server
                 _disposables = null;
             }
         }
-
     }
-
 }

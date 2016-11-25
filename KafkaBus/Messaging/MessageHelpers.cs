@@ -1,22 +1,14 @@
 ﻿using KafkaBus.Common;
-using KafkaBus.Messaging;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Internal;
 using System;
-using System.IO;
-using System.Linq;
 
 namespace KafkaBus.Messaging
 {
     internal static class MessageHelpers
     {
-        const string HTTP_RESPONSE_VERSION = "1.1";
-        readonly static string[] HTTP_RESPONSE_SERVER_HEADER = new string[] { "RestBus.AspNet" };
+        private const string HTTP_RESPONSE_VERSION = "1.1";
+        private static readonly string[] HTTP_RESPONSE_SERVER_HEADER = new string[] { "RestBus.AspNet" };
 
-
-        internal static bool TryGetServiceMessage (this KafkaMessagePacket request, out ServiceMessage message)
-        {
+        internal static bool TryGetServiceMessage(this KafkaMessagePacket request, out ServiceMessage message) {
             if (request == null) throw new ArgumentNullException("request");
 
             //message = new ServiceMessage();
@@ -65,7 +57,6 @@ namespace KafkaBus.Messaging
             //    req.Headers = headers;
             //}
 
-
             ////Create Response
             //message.CreateResponseBody();
             //IHttpResponseFeature resp = message as IHttpResponseFeature;
@@ -80,11 +71,9 @@ namespace KafkaBus.Messaging
             //}
             message = new ServiceMessage();
             return true;
-
         }
 
-        internal static KafkaMessagePacket ToKafkaMessagePacket(this ServiceMessage message)
-        {
+        internal static KafkaMessagePacket ToKafkaMessagePacket(this ServiceMessage message) {
             if (message == null) throw new ArgumentNullException("message");
 
             var response = new KafkaMessagePacket();
@@ -108,7 +97,7 @@ namespace KafkaBus.Messaging
             //{
             //    response.StatusDescription = respFeature.ReasonPhrase;
             //}
-            
+
             //if (message.OriginalResponseBody != null && message.OriginalResponseBody.CanRead)
             //{
             //    //NOTE: OriginalResponseBody.CanRead will be false if the stream was disposed.

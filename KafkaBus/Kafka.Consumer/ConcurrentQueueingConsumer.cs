@@ -1,9 +1,6 @@
 ﻿using RdKafka;
-using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Threading;
-
 
 namespace KafkaBus.Kafka.Consumer
 {
@@ -12,13 +9,12 @@ namespace KafkaBus.Kafka.Consumer
     /// </summary>
     internal sealed class ConcurrentQueueingConsumer : EventConsumer
     {
-        readonly ConcurrentQueue<Message> _queue = new ConcurrentQueue<Message>();
-        readonly ManualResetEventSlim _itemQueuedEvent;
-        volatile bool _isRunning = false;
-        volatile bool _isClosed = false;
+        private readonly ConcurrentQueue<Message> _queue = new ConcurrentQueue<Message>();
+        private readonly ManualResetEventSlim _itemQueuedEvent;
+        private volatile bool _isRunning = false;
+        private volatile bool _isClosed = false;
 
         public ConcurrentQueueingConsumer(Config config, string brokerList = null) : base(config, brokerList) {
-
         }
 
         public bool IsRunning {
@@ -29,7 +25,5 @@ namespace KafkaBus.Kafka.Consumer
                 _isRunning = value;
             }
         }
-
-
     }
 }

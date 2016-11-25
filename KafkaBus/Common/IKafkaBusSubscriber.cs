@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace KafkaBus.Common
 {
@@ -23,8 +21,7 @@ namespace KafkaBus.Common
         //Consider omittting the Started events so only Succeeded/Failed/Lost events are exposed
         //Consider removing Reconnected events and expose them via ConnectionStarted/Failed events
         //Consider passing the error message in ConnectionFailure to the event (also for Lost events if there is any exception)
-        //Consider exposing a dictionary like event interface where individual events can be subscribed to/unsubscribed from 
+        //Consider exposing a dictionary like event interface where individual events can be subscribed to/unsubscribed from
         //so that new events can be added without modifying the interface. -- If so make the events discoverable.
-
     }
 }

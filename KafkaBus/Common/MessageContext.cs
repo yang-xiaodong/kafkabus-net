@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace KafkaBus.Common
+﻿namespace KafkaBus.Common
 {
     public class MessageContext
     {
@@ -17,6 +12,5 @@ namespace KafkaBus.Common
         /// Broker specific message item.
         /// </summary>
         public object Dispatch { get; set; }
-
     }
 }

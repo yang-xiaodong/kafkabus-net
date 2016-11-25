@@ -10,44 +10,38 @@ using System.Threading.Tasks;
 
 namespace KafkaBus.Messaging
 {
-
     internal class ServiceMessage
         : IFeatureCollection, IHttpRequestFeature, IHttpResponseFeature, IHttpConnectionFeature
     {
+        private int featureRevision;
+        private object _currentIHttpRequestFeature;
+        private object _currentIHttpResponseFeature;
+        private object _currentIHttpConnectionFeature;
+        private List<KeyValuePair<Type, object>> otherFeatures;
+        private volatile bool _disposed;
+        private string _scheme;
+        private string _pathBase;
+        private string _path;
+        private string _queryString;
 
-        int featureRevision;
-        object _currentIHttpRequestFeature;
-        object _currentIHttpResponseFeature;
-        object _currentIHttpConnectionFeature;
-        List<KeyValuePair<Type, object>> otherFeatures;
-        volatile bool _disposed;
-        string _scheme;
-        string _pathBase;
-        string _path;
-        string _queryString;
-
-        readonly object _onStartingSync = new object();
-        readonly object _onCompletedSync = new object();
+        private readonly object _onStartingSync = new object();
+        private readonly object _onCompletedSync = new object();
 
         internal List<KeyValuePair<Func<object, Task>, object>> _onStarting;
         internal List<KeyValuePair<Func<object, Task>, object>> _onCompleted;
         internal Exception _applicationException;
 
-        static SequenceGenerator connectionIdSeqGen = new SequenceGenerator(DateTime.UtcNow.Ticks, true);
+        private static SequenceGenerator connectionIdSeqGen = new SequenceGenerator(DateTime.UtcNow.Ticks, true);
 
-        internal bool HasResponseStarted
-        {
-            get
-            {
+        internal bool HasResponseStarted {
+            get {
                 if (OriginalResponseBody == null) return false;
                 return OriginalResponseBody.Length > 0;
             }
         }
 
-        internal bool HasApplicationException
-        {
-            get
-            {
+        internal bool HasApplicationException {
+            get {
                 return _applicationException != null;
             }
         }
@@ -56,46 +50,37 @@ namespace KafkaBus.Messaging
 
         internal MemoryStream OriginalRequestBody { get; private set; }
 
-        internal void CreateResponseBody()
-        {
+        internal void CreateResponseBody() {
             //TODO: Implement a pooled MemoryStream and replace MemoryStream throughout solution.
             OriginalResponseBody = new MemoryStream();
             ((IHttpResponseFeature)this).Body = OriginalResponseBody;
         }
 
-        internal void CreateRequestBody(byte[] content)
-        {
+        internal void CreateRequestBody(byte[] content) {
             //TODO: Implement a pooled MemoryStream and replace MemoryStream throughout solution.
             OriginalRequestBody = new MemoryStream(content);
             ((IHttpRequestFeature)this).Body = OriginalRequestBody;
         }
 
-        public void OnStarting(Func<object, Task> callback, object state)
-        {
-            lock (_onStartingSync)
-            {
-                if (_onStarting == null)
-                {
+        public void OnStarting(Func<object, Task> callback, object state) {
+            lock (_onStartingSync) {
+                if (_onStarting == null) {
                     _onStarting = new List<KeyValuePair<Func<object, Task>, object>>();
                 }
                 _onStarting.Add(new KeyValuePair<Func<object, Task>, object>(callback, state));
             }
         }
 
-        public void OnCompleted(Func<object, Task> callback, object state)
-        {
-            lock (_onCompletedSync)
-            {
-                if (_onCompleted == null)
-                {
+        public void OnCompleted(Func<object, Task> callback, object state) {
+            lock (_onCompletedSync) {
+                if (_onCompleted == null) {
                     _onCompleted = new List<KeyValuePair<Func<object, Task>, object>>();
                 }
                 _onCompleted.Add(new KeyValuePair<Func<object, Task>, object>(callback, state));
             }
         }
 
-        internal ServiceMessage()
-        {
+        internal ServiceMessage() {
             _currentIHttpRequestFeature = this;
             _currentIHttpResponseFeature = this;
             _currentIHttpConnectionFeature = this;
@@ -108,39 +93,32 @@ namespace KafkaBus.Messaging
 
         #region IFeatureCollection Implementation
 
-        object IFeatureCollection.this[Type key]
-        {
-            get
-            {
+        object IFeatureCollection.this[Type key] {
+            get {
                 if (key == typeof(IHttpRequestFeature)) { return _currentIHttpRequestFeature; }
                 if (key == typeof(IHttpResponseFeature)) { return _currentIHttpResponseFeature; }
                 if (key == typeof(IHttpConnectionFeature)) { return _currentIHttpConnectionFeature; }
 
                 if (otherFeatures == null) return null;
-                foreach (var kv in otherFeatures)
-                {
+                foreach (var kv in otherFeatures) {
                     if (kv.Key == key) return kv.Value;
                 }
 
                 return null;
             }
 
-            set
-            {
+            set {
                 featureRevision++;
                 if (key == typeof(IHttpRequestFeature)) { _currentIHttpRequestFeature = value; }
                 if (key == typeof(IHttpResponseFeature)) { _currentIHttpResponseFeature = value; }
                 if (key == typeof(IHttpConnectionFeature)) { _currentIHttpConnectionFeature = value; }
 
-                if (otherFeatures == null)
-                {
+                if (otherFeatures == null) {
                     otherFeatures = new List<KeyValuePair<Type, object>>();
                 }
 
-                for (int i = 0; i < otherFeatures.Count; i++)
-                {
-                    if (otherFeatures[i].Key == key)
-                    {
+                for (int i = 0; i < otherFeatures.Count; i++) {
+                    if (otherFeatures[i].Key == key) {
                         otherFeatures[i] = new KeyValuePair<Type, object>(key, value);
                         return;
                     }
@@ -150,61 +128,46 @@ namespace KafkaBus.Messaging
             }
         }
 
-        bool IFeatureCollection.IsReadOnly
-        {
-            get
-            {
+        bool IFeatureCollection.IsReadOnly {
+            get {
                 return false;
             }
         }
 
-        int IFeatureCollection.Revision
-        {
-            get
-            {
+        int IFeatureCollection.Revision {
+            get {
                 return featureRevision;
             }
         }
 
-        public void Dispose()
-        {
+        public void Dispose() {
             if (_disposed) return;
             _disposed = true;
 
-            if (OriginalRequestBody != null)
-            {
-                try
-                {
+            if (OriginalRequestBody != null) {
+                try {
                     OriginalRequestBody.Dispose();
                 }
                 catch { }
             }
 
-            if (OriginalResponseBody != null)
-            {
-                try
-                {
+            if (OriginalResponseBody != null) {
+                try {
                     OriginalResponseBody.Dispose();
                 }
                 catch { }
             }
 
             IDisposable disposable;
-            if (otherFeatures != null)
-            {
-                foreach (var feature in otherFeatures)
-                {
-                    if (feature.Value != null)
-                    {
+            if (otherFeatures != null) {
+                foreach (var feature in otherFeatures) {
+                    if (feature.Value != null) {
                         disposable = feature.Value as IDisposable;
-                        if (disposable != null)
-                        {
-                            try
-                            {
+                        if (disposable != null) {
+                            try {
                                 disposable.Dispose();
                             }
-                            catch
-                            {
+                            catch {
                             }
                         }
                     }
@@ -212,157 +175,129 @@ namespace KafkaBus.Messaging
             }
         }
 
-        IEnumerator<KeyValuePair<Type, object>> IEnumerable<KeyValuePair<Type, object>>.GetEnumerator()
-        {
+        IEnumerator<KeyValuePair<Type, object>> IEnumerable<KeyValuePair<Type, object>>.GetEnumerator() {
             return GetFeatureCollectionEnumerable().GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
+        IEnumerator IEnumerable.GetEnumerator() {
             return GetFeatureCollectionEnumerable().GetEnumerator();
         }
 
-
-        IEnumerable<KeyValuePair<Type, object>> GetFeatureCollectionEnumerable()
-        {
-            if (_currentIHttpRequestFeature != null)
-            {
+        private IEnumerable<KeyValuePair<Type, object>> GetFeatureCollectionEnumerable() {
+            if (_currentIHttpRequestFeature != null) {
                 yield return new KeyValuePair<Type, object>(typeof(IHttpRequestFeature), _currentIHttpRequestFeature as IHttpRequestFeature);
             }
-            if (_currentIHttpResponseFeature != null)
-            {
+            if (_currentIHttpResponseFeature != null) {
                 yield return new KeyValuePair<Type, object>(typeof(IHttpResponseFeature), _currentIHttpResponseFeature as IHttpResponseFeature);
             }
 
-            if (otherFeatures != null)
-            {
-                foreach (var feature in otherFeatures)
-                {
+            if (otherFeatures != null) {
+                foreach (var feature in otherFeatures) {
                     yield return feature;
                 }
             }
         }
 
-        #endregion
+        #endregion IFeatureCollection Implementation
 
         #region IHttpRequestFeature Implementation
-        string IHttpRequestFeature.Protocol
-        {
+
+        string IHttpRequestFeature.Protocol {
             get; set;
         }
 
-        string IHttpRequestFeature.Scheme
-        {
-            get
-            {
+        string IHttpRequestFeature.Scheme {
+            get {
                 return _scheme ?? "http";
             }
 
-            set
-            {
+            set {
                 _scheme = value;
             }
         }
 
-        string IHttpRequestFeature.Method
-        {
+        string IHttpRequestFeature.Method {
             get; set;
         }
 
-        string IHttpRequestFeature.PathBase
-        {
-            get
-            {
+        string IHttpRequestFeature.PathBase {
+            get {
                 return _pathBase ?? String.Empty;
             }
 
-            set
-            {
+            set {
                 _pathBase = value;
             }
         }
 
-        string IHttpRequestFeature.Path
-        {
+        string IHttpRequestFeature.Path {
             get { return _path ?? String.Empty; }
             set { _path = value; }
         }
 
-        string IHttpRequestFeature.QueryString
-        {
+        string IHttpRequestFeature.QueryString {
             get { return _queryString ?? String.Empty; }
             set { _queryString = value; }
         }
 
-        IHeaderDictionary IHttpRequestFeature.Headers
-        {
+        IHeaderDictionary IHttpRequestFeature.Headers {
             get; set;
         }
 
-        Stream IHttpRequestFeature.Body
-        {
+        Stream IHttpRequestFeature.Body {
             get; set;
         }
 
-        #endregion
+        #endregion IHttpRequestFeature Implementation
 
         #region IHttpResponseFeature Implementation
-        int IHttpResponseFeature.StatusCode
-        {
+
+        int IHttpResponseFeature.StatusCode {
             get; set;
         }
 
-        string IHttpResponseFeature.ReasonPhrase
-        {
+        string IHttpResponseFeature.ReasonPhrase {
             get; set;
         }
 
-        IHeaderDictionary IHttpResponseFeature.Headers
-        {
+        IHeaderDictionary IHttpResponseFeature.Headers {
             get; set;
         }
 
-        Stream IHttpResponseFeature.Body
-        {
+        Stream IHttpResponseFeature.Body {
             get; set;
         }
 
-        bool IHttpResponseFeature.HasStarted
-        {
-            get
-            {
+        bool IHttpResponseFeature.HasStarted {
+            get {
                 return HasResponseStarted;
             }
         }
 
-        void IHttpResponseFeature.OnStarting(Func<object, Task> callback, object state)
-        {
+        void IHttpResponseFeature.OnStarting(Func<object, Task> callback, object state) {
             OnStarting(callback, state);
         }
 
-        void IHttpResponseFeature.OnCompleted(Func<object, Task> callback, object state)
-        {
+        void IHttpResponseFeature.OnCompleted(Func<object, Task> callback, object state) {
             OnCompleted(callback, state);
         }
 
-        public TFeature Get<TFeature>()
-        {
+        public TFeature Get<TFeature>() {
             var v = ((IFeatureCollection)this)[typeof(TFeature)];
-            if (v is TFeature)
-            {
+            if (v is TFeature) {
                 return (TFeature)v;
             }
             return default(TFeature);
         }
 
-        public void Set<TFeature>(TFeature instance)
-        {
+        public void Set<TFeature>(TFeature instance) {
             ((IFeatureCollection)this)[typeof(TFeature)] = instance;
         }
 
-        #endregion
+        #endregion IHttpResponseFeature Implementation
 
         #region IHttpConnectionFeature Implementation
+
         IPAddress IHttpConnectionFeature.RemoteIpAddress { get; set; }
 
         IPAddress IHttpConnectionFeature.LocalIpAddress { get; set; }
@@ -374,6 +309,7 @@ namespace KafkaBus.Messaging
         public string RawTarget { get; set; }
 
         public string ConnectionId { get; set; }
-        #endregion
+
+        #endregion IHttpConnectionFeature Implementation
     }
 }

@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace KafkaBus.Kafka.Subscription
 {
     public class SubscriberSettings
     {
-        KafkaBusSubscriber _subscriber;
-        SubscriberAckBehavior _ackBehavior;
-        int _prefetchCount;
-        const int DEFAULT_PREFETCH_COUNT = 50;
+        private KafkaBusSubscriber _subscriber;
+        private SubscriberAckBehavior _ackBehavior;
+        private int _prefetchCount;
+        private const int DEFAULT_PREFETCH_COUNT = 50;
 
         public SubscriberSettings() {
             PrefetchCount = DEFAULT_PREFETCH_COUNT;
@@ -34,7 +31,6 @@ namespace KafkaBus.Kafka.Subscription
                 _prefetchCount = value;
             }
         }
-
 
         internal KafkaBusSubscriber Subscriber {
             set {
