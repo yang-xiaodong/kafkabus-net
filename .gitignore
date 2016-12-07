@@ -12,3 +12,4 @@ obj
 .user
 *.user
 *.json
+/KafkabusTest/project.lock.json
