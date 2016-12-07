@@ -1,6 +1,8 @@
 ﻿using KafkaBus.Common;
+using RdKafka;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace KafkaBus.Kafka.Subscription
 {
@@ -29,92 +31,12 @@ namespace KafkaBus.Kafka.Subscription
             }
         }
 
-        //public void Restart() {
-        //    hasStarted.Set(true);
-
-        //    //CLose connections and channels
-        //    if (subscriberChannel != null) {
-        //        if (subscriberConsumer != null) {
-        //            try {
-        //                subscriberChannel.Channel.BasicCancel(subscriberConsumer.ConsumerTag);
-        //            }
-        //            catch { }
-        //        }
-
-        //        try {
-        //            subscriberChannel.Close();
-        //        }
-        //        catch {
-        //        }
-        //    }
-
-        //    if (workChannel != null) {
-        //        if (workConsumer != null) {
-        //            try {
-        //                workChannel.Channel.BasicCancel(workConsumer.ConsumerTag);
-        //            }
-        //            catch { }
-        //        }
-
-        //        try {
-        //            workChannel.Close();
-        //        }
-        //        catch {
-        //        }
-        //    }
-
-        //    if (_subscriberPool != null) {
-        //        _subscriberPool.Dispose();
-        //    }
-
-        //    //NOTE: CreateConnection() can throw BrokerUnreachableException
-        //    //That's okay because the exception needs to propagate to Reconnect() or Start()
-        //    var conn = connectionFactory.CreateConnection();
-
-        //    if (connectionBroken != null) connectionBroken.Dispose();
-        //    connectionBroken = new CancellationTokenSource();
-
-        //    if (stopWaitingOnQueue != null) stopWaitingOnQueue.Dispose();
-        //    stopWaitingOnQueue = CancellationTokenSource.CreateLinkedTokenSource(disposedCancellationSource.Token, connectionBroken.Token);
-
-        //    var pool = new AmqpChannelPooler(conn);
-        //    _subscriberPool = pool;
-
-        //    //Use pool reference henceforth.
-
-        //    //Create work channel and declare exchanges and queues
-        //    workChannel = pool.GetModel(ChannelFlags.Consumer);
-
-        //    //Redeclare exchanges and queues
-        //    AmqpUtils.DeclareExchangeAndQueues(workChannel.Channel, messageMapper, messagingConfig, serviceName, exchangeDeclareSync, Id);
-
-        //    //Listen on work queue
-        //    workConsumer = new ConcurrentQueueingConsumer(workChannel.Channel, requestQueued);
-        //    string workQueueName = AmqpUtils.GetWorkQueueName(messagingConfig, serviceName);
-
-        //    workChannel.Channel.BasicQos(0, (ushort)Settings.PrefetchCount, false);
-        //    workChannel.Channel.BasicConsume(workQueueName, Settings.AckBehavior == SubscriberAckBehavior.Automatic, workConsumer);
-
-        //    //Listen on subscriber queue
-        //    subscriberChannel = pool.GetModel(ChannelFlags.Consumer);
-        //    subscriberConsumer = new ConcurrentQueueingConsumer(subscriberChannel.Channel, requestQueued);
-        //    string subscriberWorkQueueName = AmqpUtils.GetSubscriberQueueName(serviceName, Id);
-
-        //    subscriberChannel.Channel.BasicQos(0, (ushort)Settings.PrefetchCount, false);
-        //    subscriberChannel.Channel.BasicConsume(subscriberWorkQueueName, Settings.AckBehavior == SubscriberAckBehavior.Automatic, subscriberConsumer);
-
-        //    //Cancel connectionBroken on connection/consumer problems
-        //    pool.Connection.ConnectionShutdown += (s, e) => { connectionBroken.Cancel(); };
-        //    workConsumer.ConsumerCancelled += (s, e) => { connectionBroken.Cancel(); };
-        //    subscriberConsumer.ConsumerCancelled += (s, e) => { connectionBroken.Cancel(); };
-        //}
-
         public MessageContext Dequeue() {
             throw new NotImplementedException();
         }
 
         public void Dispose() {
-            throw new NotImplementedException();
+            
         }
 
         public void SendResponse(MessageContext context, KafkaMessagePacket packet) {
@@ -122,7 +44,24 @@ namespace KafkaBus.Kafka.Subscription
         }
 
         public void Start() {
-            throw new NotImplementedException();
+
+            var config = new Config() { GroupId = "simple-csharp-consumer" };
+            using (var consumer = new EventConsumer(config, "")) {
+                consumer.OnMessage += (obj, msg) => {
+                    string text = Encoding.UTF8.GetString(msg.Payload, 0, msg.Payload.Length);
+                    Console.WriteLine($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {text}");
+                };
+
+                consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset(topics.First(), 0, 5) });
+
+                consumer.Start();
+
+                Console.WriteLine("Started consumer, press enter to stop consuming");
+                Console.ReadLine();
+            }
+
+
+            Console.WriteLine("Starting...");
         }
     }
 }

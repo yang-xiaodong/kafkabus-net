@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.Builder
                 //The application is running KafkaBusServer, so exit
                 return;
             }
-
+            
             var appFunc = app.Build();
 
             var _loggerFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();

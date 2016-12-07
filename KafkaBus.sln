@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4ECC1D18
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "KafkabusTest", "KafkabusTest\KafkabusTest.xproj", "{02D72098-C6AA-4252-B692-6AF4AF89C28D}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "KafkaConsistence", "KafkaConsistence\KafkaConsistence.xproj", "{E8AF8611-0EA4-4B19-BC48-87C57A87DC66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{02D72098-C6AA-4252-B692-6AF4AF89C28D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02D72098-C6AA-4252-B692-6AF4AF89C28D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02D72098-C6AA-4252-B692-6AF4AF89C28D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8AF8611-0EA4-4B19-BC48-87C57A87DC66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8AF8611-0EA4-4B19-BC48-87C57A87DC66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8AF8611-0EA4-4B19-BC48-87C57A87DC66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8AF8611-0EA4-4B19-BC48-87C57A87DC66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
