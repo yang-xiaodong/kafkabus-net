@@ -78,7 +78,6 @@ namespace KafkaBus.Messaging
 
             var response = new KafkaMessagePacket();
 
-     
             //response.Version = HTTP_RESPONSE_VERSION;
             //response.StatusCode = respFeature.StatusCode;
             //if(String.IsNullOrEmpty(respFeature.ReasonPhrase))
